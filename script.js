@@ -1,79 +1,146 @@
-window.addEventListener("DOMContentLoaded", async () => {
-  const { sdk } = window.farcaster.miniapps;
+const contractAddress = "0xe2ba182898141f19b4a7d739c715cd162d31766c";
+const contractABI = [
+    {
+        "inputs": [{"name": "to", "type": "address"}],
+        "name": "mint",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "minted",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "totalSupply",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function"
+    }
+];
 
-  try {
-    // اتصال اولیه و dismiss کردن Splash Screen
-    await sdk.actions.ready({
-      disableNativeGestures: true
-    });
-    console.log("Mini App is ready.");
-  } catch (error) {
-    console.error("Error during sdk.ready():", error);
-  }
-});
+let provider;
+let signer;
+let contract;
+const { MiniAppSDK } = window.FarcasterMiniApps || {};
+const sdk = new MiniAppSDK();
 
-// تابع اتصال به کیف پول
 async function connectWallet() {
-  const { sdk } = window.farcaster.miniapps;
+    const status = document.getElementById('status');
+    try {
+        let walletProvider = null;
+        if (sdk.wallet && sdk.wallet.ethProvider) {
+            walletProvider = sdk.wallet.ethProvider;
+            status.innerText = "Connecting via Farcaster wallet...";
+        } else if (window.ethereum) {
+            walletProvider = window.ethereum;
+            status.innerText = "Connecting to MetaMask...";
+        } else if (window.warplet) {
+            walletProvider = window.warplet;
+            status.innerText = "Connecting to Warplet...";
+        } else {
+            status.innerText = "No wallet detected! Install MetaMask or Warplet.";
+            return;
+        }
 
-  try {
-    console.log("Attempting to connect wallet...");
-    
-    // بررسی اینکه provider در دسترس باشد
-    const provider = sdk.wallet.ethProvider;
-    if (!provider) {
-      throw new Error("Wallet provider not found");
+        provider = new ethers.providers.Web3Provider(walletProvider);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+
+        contract = new ethers.Contract(contractAddress, contractABI, signer);
+        status.innerText = "Wallet connected!";
+        document.getElementById('mintButton').disabled = false;
+
+        const profileCircle = document.querySelector('.profile-circle');
+        profileCircle.style.backgroundImage = "url('https://i.imgur.com/example-profile.jpg')";
+
+        const minted = await contract.minted();
+        const totalSupply = await contract.totalSupply();
+        document.getElementById('available').innerText = `${totalSupply.sub(minted).toString()} / ${totalSupply.toString()}`;
+    } catch (error) {
+        status.innerText = "Error connecting to wallet: " + error.message;
+    }
+}
+
+async function mintNFT() {
+    const status = document.getElementById('status');
+    const availableSpan = document.getElementById('available');
+
+    if (!signer || !contract) {
+        status.innerText = "Please connect your wallet first!";
+        return;
     }
 
-    // اتصال به کیف پول و دریافت signer
-    const ethersProvider = new ethers.providers.Web3Provider(provider);
-    const signer = ethersProvider.getSigner();
-    const address = await signer.getAddress();
+    try {
+        status.innerText = "Minting your NFT...";
+        const tx = await contract.mint(await signer.getAddress(), { value: ethers.utils.parseEther("0.01") });
+        await tx.wait();
 
-    // نمایش آدرس کیف پول در دکمه
-    console.log("Connected address:", address);
-    document.querySelector(".wallet-button").textContent = address.slice(0, 6) + "..." + address.slice(-4);
-
-    // فعال کردن دکمه Mint
-    document.getElementById("mintButton").disabled = false;
-
-    // ذخیره signer در متغیر global برای استفاده در سایر قسمت‌ها
-    window.signer = signer;
-  } catch (err) {
-    console.error("Failed to connect wallet:", err);
-    alert("Failed to connect wallet. Please try again.");
-  }
+        const minted = await contract.minted();
+        const totalSupply = await contract.totalSupply();
+        availableSpan.innerText = `${totalSupply.sub(minted).toString()} / ${totalSupply.toString()}`;
+        status.innerText = "NFT minted successfully!";
+    } catch (error) {
+        status.innerText = "Error minting NFT: " + error.message;
+    }
 }
 
-// تابع mint کردن NFT
-async function mintNFT() {
-  const signer = window.signer;
-  const status = document.getElementById("status");
-
-  if (!signer) {
-    alert("Wallet not connected.");
-    return;
-  }
-
-  try {
-    // آدرس قرارداد و تابع mint
-    const contractAddress = "0xe2ba182898141f19b4a7d739c715cd162d31766c";
-    const abi = [ // ABI قرارداد برای متد mint
-      "function mint() public"
-    ];
-
-    const contract = new ethers.Contract(contractAddress, abi, signer);
-
-    status.textContent = "Minting in progress...";
-
-    // ارسال تراکنش برای mint کردن NFT
-    const tx = await contract.mint();
-    await tx.wait();
-
-    status.textContent = "Mint successful! Tx: " + tx.hash;
-    console.log("Transaction Hash:", tx.hash);
-  } catch (err) {
-    console.error("Minting failed:", err);
-    status.textContent = "Mint failed. See console for details.";
-  }
+async function handleWarpcastRequest() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('warpcast') || window.location.pathname === '/mint') {
+        document.getElementById('status').innerText = "Request received from Warpcast!";
+        try {
+            await connectWallet();
+            if (signer && contract) {
+                await mintNFT();
+            }
+        } catch (error) {
+            document.getElementById('status').innerText = "Error handling Warpcast request: " + error.message;
+        }
+    }
 }
+
+function createStar() {
+    const star = document.createElement('div');
+    star.classList.add('star');
+    
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight;
+    star.style.left = `${x}px`;
+    star.style.top = `${y}px`;
+    
+    const size = Math.random() * 3 + 2;
+    star.style.width = `${size}px`;
+    star.style.height = `${size}px`;
+    
+    const duration = Math.random() * 2 + 2;
+    star.style.animationDuration = `${duration}s`;
+    
+    const starsBackground = document.querySelector('.stars-background');
+    if (starsBackground) {
+        starsBackground.appendChild(star);
+    }
+    
+    setTimeout(() => {
+        star.remove();
+    }, duration * 1000);
+}
+
+setInterval(createStar, 500);
+
+window.onload = async function() {
+    document.getElementById('status').innerText = "Loading Mini App...";
+    try {
+        if (sdk && sdk.actions && sdk.actions.ready) {
+            await sdk.actions.ready(); // این خط عوض شده
+        }
+        document.getElementById('status').innerText = "Mini App loaded!";
+    } catch (error) {
+        document.getElementById('status').innerText = "Error loading app: " + error.message;
+    }
+    await handleWarpcastRequest();
+};
