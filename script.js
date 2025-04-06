@@ -47,7 +47,7 @@ async function mintNFT() {
 
   try {
     // آدرس قرارداد و تابع mint رو اینجا تنظیم کن
-    const contractAddress = "0xYourContractAddress";
+    const contractAddress = "0xe2ba182898141f19b4a7d739c715cd162d31766c";
     const abi = [ // یه ABI خیلی ساده برای مثال
       "function mint() public"
     ];
