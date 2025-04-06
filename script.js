@@ -1,98 +1,66 @@
-const contractAddress = "0xe2ba182898141f19b4a7d739c715cd162d31766c";
-const contractABI = [
-    {
-        "inputs": [{"name": "to", "type": "address"}],
-        "name": "mint",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "minted",
-        "outputs": [{"name": "", "type": "uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "totalSupply",
-        "outputs": [{"name": "", "type": "uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-    }
-];
+window.addEventListener("DOMContentLoaded", async () => {
+  const { sdk } = window.farcaster.miniapps;
 
-let provider;
-let signer;
-let contract;
-const { MiniAppSDK } = window.FarcasterMiniApps || {};
-const sdk = new MiniAppSDK();
+  try {
+    // اتصال اولیه و dismiss کردن Splash Screen
+    await sdk.actions.ready({
+      disableNativeGestures: true
+    });
+    console.log("Mini App is ready.");
+  } catch (error) {
+    console.error("Error during sdk.ready():", error);
+  }
+});
 
+// تابع اتصال به کیف پول
 async function connectWallet() {
-    const status = document.getElementById('status');
-    try {
-        let walletProvider = null;
-        if (sdk.wallet && sdk.wallet.ethProvider) {
-            walletProvider = sdk.wallet.ethProvider;
-            status.innerText = "Connecting via Farcaster wallet...";
-        } else if (window.ethereum) {
-            walletProvider = window.ethereum;
-            status.innerText = "Connecting to MetaMask...";
-        } else if (window.warplet) {
-            walletProvider = window.warplet;
-            status.innerText = "Connecting to Warplet...";
-        } else {
-            status.innerText = "No wallet detected! Install MetaMask or Warplet.";
-            return;
-        }
+  const { sdk } = window.farcaster.miniapps;
 
-        provider = new ethers.providers.Web3Provider(walletProvider);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
+  try {
+    const provider = sdk.wallet.ethProvider;
+    const ethersProvider = new ethers.providers.Web3Provider(provider);
+    const signer = ethersProvider.getSigner();
+    const address = await signer.getAddress();
 
-        contract = new ethers.Contract(contractAddress, contractABI, signer);
-        status.innerText = "Wallet connected!";
-        document.getElementById('mintButton').disabled = false;
+    document.querySelector(".wallet-button").textContent = address.slice(0, 6) + "..." + address.slice(-4);
+    console.log("Connected address:", address);
 
-        const profileCircle = document.querySelector('.profile-circle');
-        profileCircle.style.backgroundImage = "url('https://i.imgur.com/example-profile.jpg')";
+    document.getElementById("mintButton").disabled = false;
 
-        const minted = await contract.minted();
-        const totalSupply = await contract.totalSupply();
-        document.getElementById('available').innerText = `${totalSupply.sub(minted).toString()} / ${totalSupply.toString()}`;
-    } catch (error) {
-        status.innerText = "Error connecting to wallet: " + error.message;
-    }
+    // ذخیره signer در متغیر global
+    window.signer = signer;
+  } catch (err) {
+    console.error("Failed to connect wallet:", err);
+    alert("Failed to connect wallet. Try again.");
+  }
 }
 
+// تابع mint کردن NFT
 async function mintNFT() {
-    const status = document.getElementById('status');
-    const availableSpan = document.getElementById('available');
+  const signer = window.signer;
+  const status = document.getElementById("status");
 
-    if (!signer || !contract) {
-        status.innerText = "Please connect your wallet first!";
-        return;
-    }
+  if (!signer) {
+    alert("Wallet not connected.");
+    return;
+  }
 
-    try {
-        status.innerText = "Minting your NFT...";
-        const tx = await contract.mint(await signer.getAddress(), { value: ethers.utils.parseEther("0.01") });
-        await tx.wait();
+  try {
+    // آدرس قرارداد و تابع mint رو اینجا تنظیم کن
+    const contractAddress = "0xYourContractAddress";
+    const abi = [ // یه ABI خیلی ساده برای مثال
+      "function mint() public"
+    ];
 
-        const minted = await contract.minted();
-        const totalSupply = await contract.totalSupply();
-        availableSpan.innerText = `${totalSupply.sub(minted).toString()} / ${totalSupply.toString()}`;
-        status.innerText = "NFT minted successfully!";
-    } catch (error) {
-        status.innerText = "Error minting NFT: " + error.message;
-    }
-}
+    const contract = new ethers.Contract(contractAddress, abi, signer);
 
-async function handleWarpcastRequest() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('action');
-    if (action === 'mint') {
-        mintNFT();
-    }
+    status.textContent = "Minting in progress...";
+    const tx = await contract.mint();
+    await tx.wait();
+
+    status.textContent = "Mint successful! Tx: " + tx.hash;
+  } catch (err) {
+    console.error("Minting failed:", err);
+    status.textContent = "Mint failed. See console for details.";
+  }
 }
