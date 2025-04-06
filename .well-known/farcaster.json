@@ -1,10 +1,7 @@
 {
-  "frame": {
-    "version": "vNext",
-    "name": "Cosmic Fragment",
-    "iconUrl": "https://i.imgur.com/5lAUjyc.webp",
-    "homeUrl": "https://nft-mint-topaz.vercel.app/",
-    "imageUrl": "https://i.imgur.com/5lAUjyc.webp",
-    "buttonTitle": "Mint Now"
-  }
+    "type": "frame",
+    "url": "https://nft-mint-topaz.vercel.app",
+    "name": "Cosmic Fragment NFT",
+    "description": "Mint your unique Cosmic Fragment NFT here",
+    "image": "https://i.imgur.com/5lAUjyc.webp"
 }
