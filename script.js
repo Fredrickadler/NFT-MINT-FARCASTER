@@ -132,15 +132,18 @@ function createStar() {
 
 setInterval(createStar, 500);
 
-window.onload = async function() {
+// لود سریع‌تر و ساده‌تر
+document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('status').innerText = "Loading Mini App...";
     try {
         if (sdk && sdk.actions && sdk.actions.ready) {
-            await sdk.actions.ready(); // این خط عوض شده
+            await sdk.actions.ready();
+            console.log("SDK ready called!");
+            document.getElementById('status').innerText = "Mini App loaded!";
         }
-        document.getElementById('status').innerText = "Mini App loaded!";
+        await handleWarpcastRequest();
     } catch (error) {
-        document.getElementById('status').innerText = "Error loading app: " + error.message;
+        console.error("Error:", error);
+        document.getElementById('status').innerText = "Error: " + error.message;
     }
-    await handleWarpcastRequest();
-};
+});
