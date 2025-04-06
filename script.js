@@ -91,3 +91,8 @@ async function mintNFT() {
 
 async function handleWarpcastRequest() {
     const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    if (action === 'mint') {
+        mintNFT();
+    }
+}
