@@ -1,0 +1,15 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjkzOTkxMCwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDQ3ZTg5Y2YzMDBlNzI5MGNlMGE2Mjc2NzAwYTU1NjM5YmZiYmE3MzUifQ",
+    "payload": "eyJkb21haW4iOiJuZnQtbWludC10b3Bhei52ZXJjZWwuYXBwIn0",
+    "signature": "0x0fbbab0887a5601b45735d94904c3f54e135ae418a31d983a803ffeaceec2d635f8e1cae83ca5009333af17549f066a5e9e059c6fb45138469570a83b692ebce1b"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Cosmic Fragment",
+    "iconUrl": "https://i.imgur.com/5lAUjyc.webp",
+    "homeUrl": "https://nft-mint-topaz.vercel.app/",
+    "imageUrl": "https://i.imgur.com/5lAUjyc.webp",
+    "buttonTitle": "Mint Now"
+  }
+}
