@@ -1,25 +1,144 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #1a1a2e;
+    color: #ffffff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
 }
 
-#app {
-  text-align: center;
-  padding: 50px;
+.stars-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://i.imgur.com/stars-bg.jpg') repeat;
+    opacity: 0.2;
+    z-index: -1;
 }
 
-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 15px 32px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.container {
+    padding: 20px;
+    max-width: 424px;
+    height: 695px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
-button:hover {
-  background-color: #45a049;
+.profile-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.wallet-button {
+    padding: 8px 16px;
+    background: #8a63d2;
+    border: 1px solid #ffffff;
+    color: #ffffff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+.wallet-button:hover {
+    background: #a78bfa;
+}
+
+.profile-circle {
+    width: 40px;
+    height: 40px;
+    background: #8a63d2;
+    border-radius: 50%;
+}
+
+.nft-image {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+h1 {
+    font-size: 28px;
+    margin: 10px 0;
+    color: #ffffff;
+}
+
+.nft-description {
+    font-family: 'Roboto Slab', serif;
+    font-weight: 300;
+    font-size: 14px;
+    color: #d3ccff;
+    margin: 10px 0;
+}
+
+.nft-availability {
+    font-size: 14px;
+    margin: 10px 0;
+    color: #cccccc;
+}
+
+.mint-button {
+    padding: 10px 60px;
+    background: #8a63d2;
+    border: none;
+    color: #ffffff;
+    font-size: 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.mint-button:disabled {
+    background: #6b4ba8;
+    cursor: not-allowed;
+}
+
+.mint-button:hover:not(:disabled) {
+    background: #a78bfa;
+    box-shadow: 0 0 15px #8a63d2;
+}
+
+.mint-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shine 2s infinite;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    20% { left: 100%; }
+    100% { left: 100%; }
+}
+
+.star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle linear infinite;
+    z-index: 0;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+#status {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #d3ccff;
 }
