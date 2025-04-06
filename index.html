@@ -12,7 +12,6 @@
     <meta property="og:image:height" content="630">
     <meta property="og:url" content="https://nft-mint-topaz.vercel.app">
     <meta property="og:type" content="website">
-    
     <!-- Farcaster Frame Tags -->
     <meta name="fc:frame" content='{
       "version": "vNext",
@@ -26,7 +25,6 @@
       ],
       "post_url": "https://nft-mint-topaz.vercel.app/api/mint"
     }'>
-
     <!-- Fonts and Styles -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto+Slab:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -49,58 +47,20 @@
         <button class="mint-button" id="mintButton" onclick="mintNFT()" disabled>Mint Now</button>
         <p id="status"></p>
     </div>
-
-    <script>
-        // Initialize the Farcaster SDK
-        const sdk = new FarcasterMiniAppSdk();
-
-        // Function to connect wallet (if applicable)
-        function connectWallet() {
-            sdk.connectWallet()
-                .then(() => {
-                    console.log('Wallet connected!');
-                })
-                .catch((error) => {
-                    console.error('Error connecting wallet:', error);
-                });
-        }
-
-        // Function to handle minting (request to the server)
-        function mintNFT() {
-            // Enable the mint button if wallet is connected
-            const mintButton = document.getElementById('mintButton');
-            mintButton.disabled = true;
-            mintButton.textContent = 'Minting...';
-
-            // Send mint request to server
-            fetch('https://nft-mint-topaz.vercel.app/api/mint', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    wallet: sdk.getWalletAddress(), // Assuming wallet address is required
-                }),
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    document.getElementById('status').textContent = 'Minted successfully!';
-                } else {
-                    document.getElementById('status').textContent = 'Minting failed!';
-                }
-                mintButton.textContent = 'Mint Now';
-                mintButton.disabled = false;
-            })
-            .catch((error) => {
-                console.error('Minting error:', error);
-                document.getElementById('status').textContent = 'Minting failed!';
-                mintButton.textContent = 'Mint Now';
-                mintButton.disabled = false;
-            });
-        }
-    </script>
-
     <script src="script.js"></script>
+    <script type="text/javascript">
+        // Initialize Farcaster SDK
+        import { sdk } from '@farcaster/frame-sdk';
+
+        // Call ready to dismiss the splash screen once the app is ready
+        (async () => {
+            try {
+                // Wait for the app to load and then dismiss the splash screen
+                await sdk.actions.ready({ disableNativeGestures: true });
+            } catch (error) {
+                console.error("Error dismissing splash screen:", error);
+            }
+        })();
+    </script>
 </body>
 </html>
