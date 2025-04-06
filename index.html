@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cosmic Fragment NFT</title>
+
     <!-- Open Graph Tags -->
     <meta property="og:title" content="Cosmic Fragment NFT">
     <meta property="og:description" content="A unique piece of digital art, crafted with cosmic energy and rare stardust. Own a fragment of the universe!">
@@ -12,19 +13,23 @@
     <meta property="og:image:height" content="630">
     <meta property="og:url" content="https://nft-mint-topaz.vercel.app">
     <meta property="og:type" content="website">
-    <!-- Farcaster Frame Tags -->
+
+    <!-- Farcaster Frame Embed -->
     <meta name="fc:frame" content='{
-      "version": "vNext",
-      "image": "https://i.imgur.com/5lAUjyc.webp",
-      "buttons": [
-        {
-          "label": "Mint Now",
-          "action": "post",
-          "target": "https://nft-mint-topaz.vercel.app/api/mint"
+      "version": "next",
+      "imageUrl": "https://i.imgur.com/5lAUjyc.webp",
+      "button": {
+        "title": "Mint Now",
+        "action": {
+          "type": "launch_frame",
+          "url": "https://nft-mint-topaz.vercel.app/api/mint",
+          "name": "Cosmic Fragment NFT",
+          "splashImageUrl": "https://i.imgur.com/5lAUjyc.webp",
+          "splashBackgroundColor": "#1a1a2e"
         }
-      ],
-      "post_url": "https://nft-mint-topaz.vercel.app/api/mint"
-    }'>
+      }
+    }' />
+
     <!-- Fonts and Styles -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto+Slab:wght@300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -48,19 +53,5 @@
         <p id="status"></p>
     </div>
     <script src="script.js"></script>
-    <script type="text/javascript">
-        // Initialize Farcaster SDK
-        import { sdk } from '@farcaster/frame-sdk';
-
-        // Call ready to dismiss the splash screen once the app is ready
-        (async () => {
-            try {
-                // Wait for the app to load and then dismiss the splash screen
-                await sdk.actions.ready({ disableNativeGestures: true });
-            } catch (error) {
-                console.error("Error dismissing splash screen:", error);
-            }
-        })();
-    </script>
 </body>
 </html>
